@@ -28,6 +28,7 @@
 | *SentencePiece* | Kudo & Richardson, 2018 | LLaMA 分词器实现基础 | ch1 |
 | *RoFormer: Enhanced Transformer with Rotary Position Embedding* | Su et al., 2021 | RoPE：旋转注入相对位置 | ch2 |
 | *YaRN: Efficient Context Window Extension of LLMs* | Peng et al., 2023 | 频率缩放式长度外推 | ch2（延伸） |
+| *Lost in the Middle: How Language Models Use Long Contexts* | Liu et al., TACL 2024 | 长上下文召回的 U 形退化曲线 | ch2 §2.7（第二层天花板的实证） |
 | *Fast Transformer Decoding: One Write-Head is All You Need* | Shazeer, 2019 | MQA | ch4 |
 | *GQA: Training Generalized Multi-Query Transformer Models* | Ainslie et al., EMNLP 2023 | GQA 与消融实验（8 组质量近无损） | ch4 |
 | *GLU Variants Improve Transformer* | Shazeer, 2020 | SwiGLU | ch5 |
@@ -55,6 +56,7 @@
 | Multi-Token Prediction | DeepSeek-V3 (2024) | ch10 投机解码节内一笔带过 | 与投机解码同属"绕过逐字瓶颈"，合并叙述避免碎片化 |
 | 状态空间模型 | Mamba/Mamba-2, RWKV | 附录延伸阅读 | 是 Transformer 的替代而非组件，展开会破坏主线；给读者一个"注意力 O(n²) 的出路"指针 |
 | 长上下文扩展 | YaRN, NTK-aware, ALiBi | ch2 工程视角节 + 延伸阅读 | RoPE 频率手术是 ch2 相对性结论的直接应用，正文点到机制即可 |
+| 上下文窗口上限归属 | Lost in the Middle (Liu 2024)；推理服务 max_model_len 配置实践 | ch2 §2.7 三层天花板 + ch9 §9.1 账本回收 | "是模型限制还是服务限制"是读者高频疑问；三层框架（量程/训练分布/开放成本）正面回答，200K→65 GB 账本作为 ch2→ch9 新伏笔 |
 | 量化 | GPTQ, AWQ, GGUF/llama.cpp, FP8 KV | ch9/ch10 正文短节 | 显存与带宽两章的"第三味药"，讲原理（低精度=省容量+等效带宽翻倍）不讲工具链细节 |
 | FlashAttention-3 | Dao et al., 2024 | ch10 延伸阅读 | Hopper 特化，原理与 FA1/2 一脉相承，正文讲通用原理即可 |
 | 推理引擎演进 | vLLM V1 重构 (2025)：调度器简化、近零开销 prefix caching | ch10 正文事实基准 | 已验证：V1 重构确认"控制平面开销"是真实工程痛点，支撑 ch10 的 CPU/GPU 分工叙事 |
@@ -119,6 +121,7 @@
 - **教学验证**：参考 EleutherAI 博客与主流教程的"先二维后高维"路径；里程表多转盘类比为原创表达并声明边界。
 - **前沿补充**：长上下文三条路线入正文短节：位置插值/NTK/YaRN（频率手术）与"直接抬 base"（Llama 3 将 base 提至 500000）；ALiBi 作为旁支在延伸阅读。
 - **缺口填补**：已识别缺口"长上下文扩展机制"——本章工程视角节展开。
+- **追加（上下文窗口归属）**：新增 §2.7"三层天花板"，正面回答"上下文窗口是模型限制还是推理服务限制"：①RoPE 量程（§2.6 频率手术）②训练分布有效窗口（引 Liu et al. TACL 2024 的 lost in the middle U 形曲线）③服务开放成本（200K→约 65 GB KV 剧透，ch9 §9.1 用 ch4 公式精确结清：320 KB/token × 200K，超过 TP=4 后整个块池 60%；MHA 时代 ~524 GB 不可行）。新增练习 2.5（量级估算）与附录 B 答案；ch8 §8.6 补前向指引。
 
 ### ch3 · 注意力（第 4 轮）
 - **论文验证**：$\text{softmax}(QK^\top/\sqrt{d_k})V$ 与 Vaswani 2017 §3.2.1 一致；缩放理由（点积方差随 $d_k$ 线性增长、推进 softmax 饱和区）即原论文脚注 4 的形式化；因果掩码加性 $-\infty$ 实现与原论文 §3.2.3 一致。

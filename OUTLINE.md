@@ -28,7 +28,7 @@ curl 发出请求 ──► [外壳] HTTP 服务 · Chat Template · 排队 · �
 
 伏笔主干线（继承 V1 骨架并强化）：
 因果掩码（ch3）→ 历史 K/V 不变（ch8 回收）→ KV Cache 吃显存（ch9 回收）→ 省显存为了大 batch（ch10 回收）。
-辅助伏笔：嵌入是上下文无关的（ch1）→ 注意力语境化（ch3 回收）；行序可打乱的悬念（ch1）→ 位置编码（ch2 回收）；FFN 置零会怎样（ch5 ★题）→ 残差优雅降级（ch6 回收）；只取末行（ch7）→ Decode 每步只算一个 token（ch8 回收）。
+辅助伏笔：嵌入是上下文无关的（ch1）→ 注意力语境化（ch3 回收）；行序可打乱的悬念（ch1）→ 位置编码（ch2 回收）；上下文窗口的三层天花板（ch2 §2.7 埋"约 65 GB"剧透）→ ch9 §9.1 精确对账；FFN 置零会怎样（ch5 ★题）→ 残差优雅降级（ch6 回收）；只取末行（ch7）→ Decode 每步只算一个 token（ch8 回收）。
 
 ---
 
@@ -47,7 +47,7 @@ curl 发出请求 ──► [外壳] HTTP 服务 · Chat Template · 排队 · �
 | 章 | 文件 | 核心论点 | 预估字数 |
 |----|------|---------|---------|
 | 第 1 章 · 分词与嵌入：语言的数字化两级跳 | `part1-chapter01-分词与嵌入.md` | 分词解决"切多细"（BPE 演示合并全过程），嵌入解决"编号如何携带语义"（可查表的分布式坐标）；此刻的向量上下文无关且行序可互换——留给 ch2/ch3 的双重悬念 | 5000~6500 |
-| 第 2 章 · 位置编码：旋转出来的顺序感 | `part1-chapter02-位置编码.md` | 没有位置信息的模型是词袋；RoPE 把绝对位置转成 Q/K 旋转角，点积中自动涌现相对距离——章首用三句话+二维数值例建立"注意力用 Q·K 点积衡量相关"的最小前提（完整推导标注见 ch3，消除 V1 含糊话术）；含代码锚点 | 5000~6500 |
+| 第 2 章 · 位置编码：旋转出来的顺序感 | `part1-chapter02-位置编码.md` | 没有位置信息的模型是词袋；RoPE 把绝对位置转成 Q/K 旋转角，点积中自动涌现相对距离——章首用三句话+二维数值例建立"注意力用 Q·K 点积衡量相关"的最小前提（完整推导标注见 ch3，消除 V1 含糊话术）；§2.7 回答"上下文窗口是模型还是推理服务的限制"——三层天花板（量程/训练分布/服务开放成本），工程账本留 ch9 回收；含代码锚点 | 5000~6500 |
 
 ### Part II · 核心腹地：一层之内发生了什么（4 章）
 
@@ -97,7 +97,7 @@ curl 发出请求 ──► [外壳] HTTP 服务 · Chat Template · 排队 · �
 |----|----------------|----------|-------------------|
 | ch0 | Vaswani 2017；Touvron 2023（参数表） | vLLM V1 引擎分层（API server → EngineCore） | — |
 | ch1 | Sennrich 2016（BPE）；Kudo 2018（SentencePiece）；Mikolov 2013（词向量几何） | tiktoken/SentencePiece 演示页 | **BPE 合并过程手推演示**（内部只有思想无过程） |
-| ch2 | Su 2021（RoPE）；Vaswani 2017（正弦编码）；Peng 2023（YaRN） | HF rotate_half 实现 | 长上下文扩展机制（内部仅一句带过） |
+| ch2 | Su 2021（RoPE）；Vaswani 2017（正弦编码）；Peng 2023（YaRN）；Liu 2024（Lost in the Middle） | HF rotate_half 实现 | 长上下文扩展机制（内部仅一句带过）+ 上下文窗口三层天花板（§2.7） |
 | ch3 | Vaswani 2017；Elhage 2021（circuits）；Bahdanau 2015（注意力起源） | PyTorch SDPA（is_causal 语义）；HF modeling_llama | — |
 | ch4 | Shazeer 2019（MQA）；Ainslie 2023（GQA 消融）；DeepSeek-V2 2024（MLA） | HF repeat_kv 实现 | **MLA 短节**（内部停在 GQA） |
 | ch5 | Shazeer 2020（SwiGLU）；Geva 2021（键值存储）；Meng 2022（ROME）；Mixtral 2024 | HF LlamaMLP | **MoE 短节**（FFN 的下一步）；键值视角最小数值例 |
